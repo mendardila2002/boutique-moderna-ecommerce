@@ -106,4 +106,5 @@ ADMIN_PASSWORD="tu_password_seguro"
 
 ---
 
+Proyecto SENA presentado por Iván Andrés Méndez Ardila
 Desarrollado con ❤️ para **Boutique Moderna**.
