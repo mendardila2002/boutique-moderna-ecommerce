@@ -1,0 +1,95 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+enum Category {
+  HOMBRE
+  MUJER
+}
+
+enum DeliveryType {
+  PICKUP
+  DELIVERY
+}
+
+enum PaymentMethod {
+  CASH
+  NEQUI
+}
+
+enum OrderStatus {
+  PENDIENTE
+  CONFIRMADO
+  ENTREGADO
+  CANCELADO
+}
+
+type SizeStock {
+  talla    String
+  cantidad Int
+}
+
+model Product {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  nombre      String
+  descripcion String
+  precio      Float
+  categoria   Category
+  stock       Int         @default(0) // Stock total calculado
+  sizeStock   SizeStock[]
+  imagenes    String[]
+  tallas      String[]
+  colores     String[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// Tipos incrustados (Composite Types) recomendados para MongoDB en Prisma
+type CustomerData {
+  nombre    String
+  email     String?
+  celular   String
+  direccion String?
+}
+
+// Guardamos una copia del precio y nombre al momento de la compra para 
+// mantener el historial intacto aunque el producto original cambie.
+type OrderItem {
+  productId String @db.ObjectId
+  nombre    String
+  precio    Float
+  cantidad  Int
+  talla     String?
+  color     String?
+}
+
+model Order {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  cliente         CustomerData
+  productos       OrderItem[]
+  total           Float
+  tipoEntrega     DeliveryType
+  metodoPago      PaymentMethod
+  comprobantePago String?
+  estado          OrderStatus   @default(PENDIENTE)
+  observaciones   String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  nombre    String
+  email     String
+  celular   String?
+  mensaje   String
+  leido     Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
